@@ -51,60 +51,6 @@ def normalize_df(df):
     df = df.loc[:, ~df.columns.duplicated()]
     price_cols = [c for c in df.columns if 'PMVG' in c.upper() or 'PMC' in c.upper()]
     for c in price_cols:
-        df[c] = pd.to_numeric
-import sys
-import os
-import tkinter as tk
-from tkinter import ttk, messagebox
-import pandas as pd
-import re
-import webbrowser
-from datetime import datetime
-import requests
-from bs4 import BeautifulSoup
-
-# Dependências:
-# pip install pandas openpyxl xlrd requests beautifulsoup4
-
-# Configura pasta de dados
-if getattr(sys, 'frozen', False):
-    base_folder = os.path.dirname(sys.executable)
-else:
-    base_folder = os.path.join(os.path.expanduser("~"), "Documents")
-BASE_DIR = os.path.join(base_folder, "ConsultaPMVGData")
-os.makedirs(BASE_DIR, exist_ok=True)
-
-ICMS_RATES = {
-    'AC': 17, 'AL': 18, 'AP': 18, 'AM': 18, 'BA': 18, 'CE': 18,
-    'DF': 18, 'ES': 17, 'GO': 18, 'MA': 18, 'MT': 17, 'MS': 17,
-    'MG': 18, 'PA': 18, 'PB': 18, 'PR': 18, 'PE': 18, 'PI': 18,
-    'RJ': 20, 'RN': 18, 'RS': 18, 'RO': 17, 'RR': 18, 'SC': 17,
-    'SP': 18, 'SE': 18, 'TO': 18
-}
-
-def detect_header_row(path):
-    df0 = pd.read_excel(path, header=None, nrows=100,
-                        engine='xlrd' if path.lower().endswith('.xls') else 'openpyxl')
-    for idx, row in df0.iterrows():
-        headers = [str(x).strip().upper() for x in row]
-        if 'PRODUTO' in headers and 'APRESENTAÇÃO' in headers:
-            return idx
-    raise RuntimeError("Linha de cabeçalho não encontrada.")
-
-def normalize_df(df):
-    mapping = {}
-    for col in df.columns:
-        name = str(col).strip().upper()
-        if 'PRODUTO' in name:
-            mapping[col] = 'Nome do Produto'
-        elif 'APRESENTAÇÃO' in name:
-            mapping[col] = 'Apresentação'
-        elif 'LABORATÓRIO' in name or 'MARCA' in name:
-            mapping[col] = 'Marca'
-    df = df.rename(columns=mapping)
-    df = df.loc[:, ~df.columns.duplicated()]
-    price_cols = [c for c in df.columns if 'PMVG' in c.upper() or 'PMC' in c.upper()]
-    for c in price_cols:
         df[c] = pd.to_numeric(df[c], errors='coerce')
     return df[['Nome do Produto', 'Marca', 'Apresentação'] + price_cols]
 
